@@ -19,6 +19,7 @@ KAFKA_INCLUDE=y
 STORM_INCLUDE=y
 ZEPPELIN_INCLUDE=y
 ZOOKEEPER_INCLUDE=y
+TENSORFLOW_INCLUDE=y
 
 MAGPIE_NO_LOCAL_DIR=n
 MAGPIE_HOSTNAME_MAP=n
@@ -220,7 +221,7 @@ endef
 # Perhaps there is a niftier way to do this in sed than what I'm doing, glad
 # to take suggestions.  I couldn't figure out a way to do it in 1 pass.
 define common-addition
-	for project in hadoop hbase hive phoenix pig mahout spark kafka zeppelin storm zookeeper; do \
+	for project in hadoop hbase hive phoenix pig mahout spark kafka zeppelin storm zookeeper tensorflow; do \
 		if echo $(2) | grep -q $$project; then \
 			sed -i -e "/@MAGPIE_JOB_TYPES@/a @MAGPIE_JOB_TYPES_TEMP@/" $(1); \
 			sed -i -e "/@MAGPIE_JOB_TYPES@/{r magpie-magpie-customizations-job-$$project" -e "}" $(1); \
@@ -253,16 +254,28 @@ define create-templates
 	sed -i -e "/@MAGPIE_REMOTE_SHELL@/{r magpie-magpie-customizations-remote-shell" -e "d}" magpie-magpie-customizations-substitution-daemon
 	sed -i -e "/@MAGPIE_ENVIRONMENT_VARIABLE_SCRIPT@/{r magpie-magpie-customizations-environment-variable-script" -e "d}" magpie-magpie-customizations-substitution-daemon
 
+	cp magpie-magpie-customizations magpie-magpie-customizations-substitution-tensorflow
+
+	sed -i -e "/@MAGPIE_SCRIPT@/,+1d" magpie-magpie-customizations-substitution-tensorflow
+	sed -i -e "/@MAGPIE_INTERACTIVE@/,+1d" magpie-magpie-customizations-substitution-tensorflow
+	sed -i -e "/@MAGPIE_SETUPONLY@/,+1d" magpie-magpie-customizations-substitution-tensorflow
+	sed -i -e "/@MAGPIE_REMOTE_SHELL@/,+1d" magpie-magpie-customizations-substitution-tensorflow
+	sed -i -e "/@MAGPIE_ENVIRONMENT_VARIABLE_SCRIPT@/,+1d" magpie-magpie-customizations-substitution-tensorflow
+
 	if test "${MAGPIE_NO_LOCAL_DIR}" = "y"; then \
 		sed -i -e "/@MAGPIE_NO_LOCAL_DIR@/{r magpie-magpie-customizations-no-local-dir" -e "d}" magpie-magpie-customizations-substitution-daemon; \
+		sed -i -e "/@MAGPIE_NO_LOCAL_DIR@/{r magpie-magpie-customizations-no-local-dir" -e "d}" magpie-magpie-customizations-substitution-tensorflow; \
 	else \
 		sed -i -e "/@MAGPIE_NO_LOCAL_DIR@/,+1d" magpie-magpie-customizations-substitution-daemon; \
+		sed -i -e "/@MAGPIE_NO_LOCAL_DIR@/,+1d" magpie-magpie-customizations-substitution-tensorflow; \
 	fi
 
 	if test "${MAGPIE_HOSTNAME_MAP}" = "y"; then \
 		sed -i -e "/@MAGPIE_HOSTNAME_MAP@/{r magpie-magpie-customizations-hostname-map" -e "d}" magpie-magpie-customizations-substitution-daemon; \
+		sed -i -e "/@MAGPIE_HOSTNAME_MAP@/{r magpie-magpie-customizations-hostname-map" -e "d}" magpie-magpie-customizations-substitution-tensorflow; \
 	else \
 		sed -i -e "/@MAGPIE_HOSTNAME_MAP@/,+1d" magpie-magpie-customizations-substitution-daemon; \
+		sed -i -e "/@MAGPIE_HOSTNAME_MAP@/,+1d" magpie-magpie-customizations-substitution-tensorflow; \
 	fi
 
 	cp magpie-hadoop-filesystem magpie-hadoop-filesystem-substitution
@@ -313,6 +326,7 @@ define create-templates
 	$(eval MAGPIE_SPARK_WITH_YARN_AND_HDFS := ../script-$(SCHED)/magpie.$(SCHED)-spark-with-yarn-and-hdfs)
 	$(eval MAGPIE_SPARK_WITH_ZEPPELIN := ../script-$(SCHED)/magpie.$(SCHED)-spark-with-zeppelin)
 	$(eval MAGPIE_STORM := ../script-$(SCHED)/magpie.$(SCHED)-storm)
+	$(eval MAGPIE_TENSORFLOW := ../script-$(SCHED)/magpie.$(SCHED)-tensorflow)
 
 	$(call create-all)
 	$(if $(findstring "${HADOOP_INCLUDE}", "y"), $(call create-hadoop))
@@ -327,6 +341,7 @@ define create-templates
 	$(if $(findstring "${HADOOP_INCLUDE}${SPARK_INCLUDE}", "yy"), $(call create-spark-with-yarn-and-hdfs))
 	$(if $(findstring "${ZEPPELIN_INCLUDE}", "y"), $(call create-spark-with-zeppelin))
 	$(if $(findstring "${STORM_INCLUDE}${ZOOKEEPER_INCLUDE}", "yy"), $(call create-storm))
+	$(if $(findstring "${TENSORFLOW_INCLUDE}", "y"), $(call create-tensorflow))
 endef
 
 define create-all
@@ -703,4 +718,22 @@ define create-storm
 	sed -i -e "s/STORM_SETUP=.*/STORM_SETUP=yes/" $(MAGPIE_STORM)
 	sed -i -e "s/ZOOKEEPER_SETUP=.*/ZOOKEEPER_SETUP=yes/" $(MAGPIE_STORM)
 	sed -i -e "s/ZOOKEEPER_VERSION=\"\(.*\)\"/ZOOKEEPER_VERSION=\"$(STORM_ZOOKEEPER_VERSION_DEFAULT)\"/" $(MAGPIE_STORM)
+endef
+
+define create-tensorflow
+	echo "Creating magpie.$(SCHED)-tensorflow"
+	cat 	magpie-shebang \
+		magpie-header-llnl \
+		magpie-config-$(SCHED)-header \
+		magpie-config-$(SCHED) \
+		magpie-magpie-customizations-substitution-tensorflow \
+		magpie-general-configuration-header \
+		magpie-general-configuration-python \
+		magpie-tensorflow \
+		magpie-run-job-header-substitution \
+		magpie-run-job-$(DIST) > $(MAGPIE_TENSORFLOW)
+	$(call common-substitution, ${MAGPIE_TENSORFLOW},${JAVA_DEFAULT})
+	$(call common-additions, ${MAGPIE_TENSORFLOW}, tensorflow)
+	sed -i -e "s/MAGPIE_JOB_TYPE=\"\(.*\)\"/MAGPIE_JOB_TYPE=\"tensorflow\"/" $(MAGPIE_TENSORFLOW)
+	sed -i -e "s/TENSORFLOW_SETUP=.*/TENSORFLOW_SETUP=yes/" $(MAGPIE_TENSORFLOW)
 endef
