@@ -82,6 +82,7 @@ export MAGPIE_LOCAL_DIR="/tmp/${USER}/magpie"
 #
 #             For Tensorflow, testall will run tfadd
 #
+export MAGPIE_JOB_TYPE="tensorflow"
 
 # Specify script and arguments to execute for "script" mode in
 # MAGPIE_JOB_TYPE
@@ -196,7 +197,7 @@ export TENSORFLOW_SETUP=yes
 # Set tensorflow job for MAGPIE_JOB_TYPE = tensorflow
 #
 # "tfadd" - run Tensorflow distributed add example.  Useful for making
-#           sure things are setup the way you like.
+#           sure things are setup correctly.
 #
 # "script" - execute the python script indicated by TENSORFLOW_SCRIPT_PATH.
 #            See TENSORFLOW_SCRIPT_PATH below for more information.

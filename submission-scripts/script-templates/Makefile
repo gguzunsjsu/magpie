@@ -256,9 +256,9 @@ define create-templates
 
 	cp magpie-magpie-customizations magpie-magpie-customizations-substitution-tensorflow
 
-	sed -i -e "/@MAGPIE_SCRIPT@/,+1d" magpie-magpie-customizations-substitution-tensorflow
-	sed -i -e "/@MAGPIE_INTERACTIVE@/,+1d" magpie-magpie-customizations-substitution-tensorflow
-	sed -i -e "/@MAGPIE_SETUPONLY@/,+1d" magpie-magpie-customizations-substitution-tensorflow
+	sed -i -e "/@MAGPIE_SCRIPT@/d" magpie-magpie-customizations-substitution-tensorflow
+	sed -i -e "/@MAGPIE_INTERACTIVE@/d" magpie-magpie-customizations-substitution-tensorflow
+	sed -i -e "/@MAGPIE_SETUPONLY@/d" magpie-magpie-customizations-substitution-tensorflow
 	sed -i -e "/@MAGPIE_REMOTE_SHELL@/,+1d" magpie-magpie-customizations-substitution-tensorflow
 	sed -i -e "/@MAGPIE_ENVIRONMENT_VARIABLE_SCRIPT@/,+1d" magpie-magpie-customizations-substitution-tensorflow
 
