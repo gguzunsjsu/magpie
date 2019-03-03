@@ -731,7 +731,7 @@ define create-tensorflow
 		magpie-general-configuration-python \
 		magpie-tensorflow \
 		magpie-run-job-header-substitution \
-		magpie-run-job-$(DIST) > $(MAGPIE_TENSORFLOW)
+		magpie-run-job-$(DIST)-distributed > $(MAGPIE_TENSORFLOW)
 	$(call common-substitution, ${MAGPIE_TENSORFLOW},${JAVA_DEFAULT})
 	$(call common-additions, ${MAGPIE_TENSORFLOW}, tensorflow)
 	sed -i -e "s/MAGPIE_JOB_TYPE=\"\(.*\)\"/MAGPIE_JOB_TYPE=\"tensorflow\"/" $(MAGPIE_TENSORFLOW)

@@ -1,0 +1,16 @@
+# This is a python script to be executed via python
+
+from __future__ import print_function
+
+import os
+import socket
+
+try:
+       hosts = os.environ['MAGPIE_TENSORFLOW_HOSTS']
+       rank = int(os.environ['MAGPIE_TENSORFLOW_RANK'])
+except:
+       print ("Missing Magpie environment variable")
+       exit (1)
+
+print (socket.gethostname(), hosts)
+print (socket.gethostname(), rank)

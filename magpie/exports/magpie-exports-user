@@ -224,7 +224,7 @@ then
         if [[ -z $tlist ]]; then
             tlist="$host:2222"
         else
-            tlist="$tlist:2222,$host"
+            tlist="$tlist,$host:2222"
         fi
     done < ${MAGPIE_LOCAL_CONF_DIR}/tmp_tensorflow_hosts
 

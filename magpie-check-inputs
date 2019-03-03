@@ -317,8 +317,6 @@ fi
 # Check General Inputs
 #
 
-__Magpie_check_if_set_is_a_directory "JAVA_HOME"
-
 if [ "${MAGPIE_PYTHON}X" != "X" ]
 then
     if [ ! -x ${MAGPIE_PYTHON} ]
@@ -353,13 +351,27 @@ if [ "${HADOOP_SETUP}" != "yes" ] \
     && [ "${ZEPPELIN_SETUP}" != "yes" ] \
     && [ "${STORM_SETUP}" != "yes" ] \
     && [ "${HIVE_SETUP}" != "yes" ] \
-    && [ "${ZOOKEEPER_SETUP}" != "yes" ]
+    && [ "${ZOOKEEPER_SETUP}" != "yes" ] \
+    && [ "${TENSORFLOW_SETUP}" != "yes" ]
 then
     echo "Neither HADOOP_SETUP nor HBASE_SETUP nor SPARK_SETUP nor KAFKA_SETUP nor ZEPPELIN_SETUP nor \
           STORM_SETUP nor HIVE_SETUP nor ZOOKEEPER_SETUP nor TENSORFLOW_SETUP \
           are set to yes, there is nothing to setup"
     exit 1
 fi
+
+# If java required, was it set to something reasonable
+
+magpieprojects_java="HADOOP PIG MAHOUT HBASE PHOENIX SPARK KAFKA ZEPPELIN STORM HIVE ZOOKEEPER"
+for project in ${magpieprojects_java}
+do
+    setupvar="${project}_SETUP"
+    if [ "${!varname}X" != "X" ] \
+        && [ "${!varname}" == "yes" ]
+    then
+        __Magpie_check_if_set_is_a_directory "JAVA_HOME"
+    fi
+done
 
 # Did user turn on something matching job run type
 
@@ -388,7 +400,7 @@ if [ "${MAGPIE_JOB_TYPE}" == "testall" ] \
     && [ "${ZEPPELIN_SETUP}" != "yes" ] \
     && [ "${STORM_SETUP}" != "yes" ] \
     && [ "${HIVE_SETUP}" != "yes" ] \
-    && [ "${ZOOKEEPER_SETUP}" != "yes" ]
+    && [ "${ZOOKEEPER_SETUP}" != "yes" ] \
     && [ "${TENSORFLOW_SETUP}" != "yes" ]
 then
     echo "Cannot run testall job type, nothing is enabled to be setup"
