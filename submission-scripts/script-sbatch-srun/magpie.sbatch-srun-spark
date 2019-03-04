@@ -592,7 +592,7 @@ export SPARK_JOB="sparkpi"
 # Please set HADOOP_LOCALSTORE to inform Yarn to set a local SSD for
 # Yarn to use for local scratch.
 #
-export SPARK_LOCAL_SCRATCH_DIR="/lustre/${USER}/sparkscratch/"
+export SPARK_LOCAL_SCRATCH_DIR="/scratch/${USER}/sparkscratch/"
 
 # SPARK_LOCAL_SCRATCH_DIR_CLEAR
 #
